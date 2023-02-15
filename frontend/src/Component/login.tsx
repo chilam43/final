@@ -13,7 +13,8 @@ export default function LoginPage() {
 
     })
     const [loginResult, setLoginResult] = useState<any>()
-    // console.log(state);
+    // console.log("login result", loginResult);
+
 
     // const [opened, setOpened] = useState(false);
     // function reset() {
@@ -35,13 +36,13 @@ export default function LoginPage() {
 
         let result = await res.json()
 
-        console.log("frontend", result);
-        localStorage.setItem('token', result.token)
+        // console.log("frontend", result);
+
 
         {
-            if (result.token && result.result == 2) { (location.href = '/setroomdetail') }
-            else if (result.token && result.result == 1) { (location.href = '/selectroom') }
-            else { (location.href = '/unprotectPage') }
+            if (result.token && result.level == 2) { localStorage.setItem('token', result.token); location.href = '/setroomdetail' }
+            else if (result.token && result.level == 1) { localStorage.setItem('token', result.token); location.href = '/' }
+            else { setLoginResult("Wrong Password Or Username") }
 
         }
 
@@ -74,8 +75,8 @@ export default function LoginPage() {
                                     <div style={{ padding: "0px 10px" }}>
                                         <button >Login</button>
                                     </div>
-                                    <div>
-                                        {loginResult == "false" && "Wrong Password Or Username"}
+                                    <div style={{ color: "red" }}>
+                                        {loginResult}
                                     </div>
 
 

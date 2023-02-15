@@ -4,7 +4,7 @@ export class UserService {
   constructor(private knex: Knex) {}
 
   public registerMember = async (body: any) => {
-    // console.log("create member from service", body);
+    console.log("create member from service", body);
 
     await this.knex
       .insert({
@@ -23,7 +23,7 @@ export class UserService {
       .select()
       .from("register")
       .where("email", body.email);
-    // console.log("service", result.length);
+    console.log("service", result.length);
     return result;
   };
   public getUser = async (id: number) => {

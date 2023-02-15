@@ -1,142 +1,139 @@
 import { Button, TextInput, Textarea } from "@mantine/core";
-import { ChangeEvent, FormEvent, useState } from "react"
+import { IconLivePhotoOff } from "@tabler/icons";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react"
 
 export function SetRoomPricePicContent() {
-    const [state, setState] = useState({
-        Aprice: "",
-        Bprice: "",
-        Cprice: "",
-        Dprice: "",
-        Acontent: "",
-        Bcontent: "",
-        Ccontent: "",
-        Dcontent: "",
-    })
+    const [value, setValue] = useState('');
+    const [textAreaValue, setTextareaValue] = useState('');
+    const [file, setFile] = useState<any>()
+    const ref = useRef(null);
 
-    const [roomAPic, setRoomAPic] = useState<File>();
-    const [roomBPic, setRoomBPic] = useState<File>();
-    const [roomCPic, setRoomCPic] = useState<File>();
-    const [roomDPic, setRoomDPic] = useState<File>();
+    // const [roomAPic, setRoomAPic] = useState<File>();
+    // const [roomBPic, setRoomBPic] = useState<File>();
+    // const [roomCPic, setRoomCPic] = useState<File>();
+    // const [roomDPic, setRoomDPic] = useState<File>();
+    const [roomInfo, setroomInfo] = useState<any[]>([])
+    // console.log(roomInfo);
+
+
+
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>, roomName: string) => {
         if (e.target.files) {
-            if (roomName === "roomA") {
-                setRoomAPic(e.target.files[0]);
+            if (roomName === "A") {
+                setFile(e.target.files[0]);
             }
 
-            if (roomName === "roomB") {
-                setRoomBPic(e.target.files[0]);
+            if (roomName === "B") {
+                setFile(e.target.files[0]);
             }
-            if (roomName === "roomC") {
-                setRoomCPic(e.target.files[0]);
+            if (roomName === "C") {
+                setFile(e.target.files[0]);
             }
-            if (roomName === "roomD") {
-                setRoomDPic(e.target.files[0]);
+            if (roomName === "D") {
+                setFile(e.target.files[0]);
             }
         }
     };
 
-    type FormState = typeof state;
+    useEffect(() => {
+        async function loadRoomInfo() {
+            let res = await fetch('http://localhost:8080/loadRoomInfo')
+            let roomInfo = await res.json()
+
+
+            setroomInfo(roomInfo.result)
+        }
+        loadRoomInfo()
+    }, [])
+
+    async function submitFile(room: string, roomid: any) {
+        const formData = new FormData()
+        formData.append("price", value)
+        formData.append("content", textAreaValue)
+        formData.append("file", file)
+        formData.append("id", roomid)
+
+        const res = await fetch("http://localhost:8080/" + room, {
+            method: "Post",
+            body: formData,
+        })
+        window.location.reload();
+    }
+
 
     function inputData(
-        placeholderPrice: string,
-        key: keyof FormState,
-        type: "text" | "number") {
-        return (
-            <>
-                <TextInput
-                    placeholder={placeholderPrice}
-                    type={type}
-                    id={key}
-                    name={key}
-                    value={state[key]}
-                    onChange={(e: any) => setState({ ...state, [`${key}`]: e.target.value })}>
-                </TextInput>
-            </>
-        )
-    }
-    function inputRoomDeatail(
-        placeholderContent: string,
-        key: keyof FormState,
-        // type: any
     ) {
+
         return (
             <>
-                <Textarea
-                    autosize
-                    placeholder={placeholderContent}
-                    // type={type}
-                    id={key}
-                    name={key}
-                    value={state[key]}
-                    onChange={(e: any) => setState({ ...state, [`${key}`]: e.target.value })}>
-                </Textarea>
+                {roomInfo.map(v =>
+                    <div>
+                        {/* <form onSubmit={(e) => { submitData(e, v.room_type) }}> */}
+                        <h2>Update {v.room_type} Info</h2>
+                        <TextInput
 
+                            type="text"
+                            id={v.id}
+                            name={v.room_type}
+                            defaultValue={v.price}
+                            onChange={(event) => { event.target.value == null ? setValue(v.price) : setValue(event.target.value) }}
+                        // onChange={(e: any) => setState({ ...state, [`${keyA}`]: e.target.value })}
+                        >
+                        </TextInput>
+                        <Textarea
+                            autosize
+
+                            id={v.id}
+                            name={v.room_type}
+                            defaultValue={v.content}
+
+                            onChange={(event) => { event.currentTarget.value == null ? setTextareaValue(v.content) : setTextareaValue(event.currentTarget.value) }}
+                        // onChange={(e: any) => setState({ ...state, [`${keyB}`]: e.target.value })}
+                        >
+                        </Textarea>
+                        <div>
+                            <input type="file" onChange={(e) => handleFileChange(e, v.room_type)} />
+                            {/* <div>{file && `${file.name} - ${file.type}`}</div> */}
+                        </div>
+                        <Button type="submit" onClick={() => {
+                            console.log("frontend", value, textAreaValue);
+
+                            submitFile(v.room_type, v.id)
+                        }}>Submit
+                        </Button>
+                        {/* </form> */}
+                    </div>
+                )}
             </>
         )
     }
-    function uploadfile(roomName: any) {
-        return (
-            <div>
-                <input type="file" onChange={(e) => handleFileChange(e, roomName)} />
-                {/* <div>{file && `${file.name} - ${file.type}`}</div> */}
-            </div>
-        );
-    }
-    async function submitData(e: FormEvent<HTMLFormElement>, differentPath: any) {
-        e.preventDefault()
-        let res = await fetch('http://localhost:8080/' + differentPath, {
-            method: "Post",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(state),
-        })
 
-        let result = await res.json()
-        return
-    }
+
+
+
+    // async function submitData(e: FormEvent<HTMLFormElement>, differentPath: any) {
+    //     e.preventDefault()
+    //     let res = await fetch('http://localhost:8080/' + differentPath, {
+    //         method: "Post",
+    //         headers: { 'Content-Type': 'application/json' },
+    //         body: JSON.stringify({ value, textAreaValue }),
+    //     })
+
+    //     let result = await res.json()
+    //     return
+    // }
 
 
     return (
         <div style={{ marginLeft: "100px", marginRight: "100px" }}>
-            <div>
-                <form onSubmit={(e) => { submitData(e, "aRoomPath") }}>
-                    <h2>Update Room A Info</h2>
-                    {inputData("Price of Room A", "Aprice", "number")}
-                    {inputRoomDeatail("Room A Content", "Acontent")}
-                    {uploadfile("roomA")}
-                    <Button type="submit" onClick={() => { }}>Submit
-                    </Button>
-                </form>
+            <div style={{ marginLeft: "1000px" }}>
+                <Button onClick={() => { localStorage.clear(); location.href = '/' }}>Login Out </Button>
             </div>
             <div>
-                <form onSubmit={(e) => { submitData(e, "bRoomPath") }}>
-                    <h2>Update Room B Info</h2>
-                    {inputData("Price of Room B", "Bprice", "number")}
-                    {inputRoomDeatail("Room B Content", "Bcontent")}
-                    {uploadfile("roomB")}
-                    <Button type="submit" onClick={() => { }}>Submit
-                    </Button>
-                </form>
+
+                {inputData()}
             </div>
-            <div>
-                <form onSubmit={(e) => { submitData(e, "cRoomPath") }}>
-                    <h2>Update Room C Info</h2>
-                    {inputData("Price of Room C", "Cprice", "number")}
-                    {inputRoomDeatail("Room C Content", "Ccontent")}
-                    {uploadfile("roomC")}
-                    <Button type="submit" onClick={() => { }}>Submit
-                    </Button>
-                </form>
-            </div>
-            <div>
-                <form onSubmit={(e) => { submitData(e, "dRoomPath") }}>
-                    <h2>Update Room D Info</h2>
-                    {inputData("Price of Room D", "Dprice", "number")}
-                    {inputRoomDeatail("Room D Content", "Dcontent")}
-                    {uploadfile("roomD")}
-                    <Button type="submit" onClick={() => { }}>Submit
-                    </Button>
-                </form>
-            </div>
-        </div>
+
+        </div >
     )
 }

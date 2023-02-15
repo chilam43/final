@@ -8,7 +8,6 @@ import React from 'react';
 import { SelectdateSelectRoom } from '../Component/selectdateSelectRoom';
 import BackgroundVideo from '../Component/video';
 import { SetRoomPricePicContent } from '../Component/setRoomPricePicContent';
-
 ///////////  在req.user 內已種左user id   因為local storage 內已有token/////
 
 
@@ -23,11 +22,16 @@ export function Selectroom() {
     const totalDay: any = searchParams.get("totalDay")
     const [amount, setAmount] = useState<any>()
     const [roomPrice, setRoomPrice] = useState<number>()
+    // console.log("frontend", roomInfo);
+    const [roomID, setRoomID] = useState<any>()
+
     useEffect(() => {
         async function loadRoomInfo() {
 
             let res = await fetch('http://localhost:8080/loadRoomInfo')
             let roomInfo = await res.json()
+            console.log(roomInfo);
+
             setroomInfo(roomInfo.result)
         }
         loadRoomInfo()
@@ -37,25 +41,29 @@ export function Selectroom() {
     function calculateAmount(roomPrice: number) {
         setAmount(totalDay * roomPrice)
     }
-    async function submitInfo(from: any, to: any, price: any,) {
-        await fetch("/calculate", {
+    const token: any = localStorage.getItem('token')
+    async function submitInfo(from: any, to: any, price: any, roomId: number) {
+        let res = await fetch("http://localhost:8080/bookingRoom", {
             method: "Post",
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ from, to, price })
+            body: JSON.stringify({ from, to, price, roomId, token })
         })
+        let bookingRoomResult = await res.json()
     }
 
 
     return (
         <div >
-            {/* {roomInfo.map(v => <div>{v}</div>)} */}
+
             <div  >
                 <BackgroundVideo />
             </div>
 
+            <div>
+                {token && token.value == undefined && <Button onClick={() => { localStorage.clear(); location.href = '/' }}>Login Out </Button>}
+            </div>
             <div style={{ backgroundColor: 'white', }} >
                 <SelectdateSelectRoom />
-
             </div>
 
             <br></br>
@@ -68,20 +76,21 @@ export function Selectroom() {
                             <div style={{ display: "flex", margin: "0px" }}>
                                 <Image style={{ height: "400px", width: "200px" }}
                                     radius="md"
-                                    src="./pic/rm1.jpeg" />
+                                    src={`http://localhost:8080/${v.picture}`}
+                                />
 
-                                <Container style={{ border: "black solid 4px", alignSelf: '100%', height: "25vh", margin: 0, paddingRight: "200px" }}>
-                                    <div style={{}}>
-                                        <p>{v.content}</p>
-
-                                        <div>{v.price}</div>
+                                <Container style={{ border: "black solid 4px", alignSelf: '100%', height: "25vh", width: "15vh", margin: 0, paddingRight: "200px" }}>
+                                    <div>
+                                        <p style={{ width: "30vh" }}>{v.content}</p>
+                                        <hr></hr>
+                                        <div>$ {v.price}</div>
                                         {/* <p>Select a room type</p>
                                         <p>Sleeps 31 ｜ King41 ｜ to 45 m²square metres</p>
                                         <p>This room retains a contemporary ambience with high ceilings and large windows</p> */}
                                     </div>
                                 </Container>
                                 <Button style={{ alignItems: "center", margin: "65px 0px" }}
-                                    onClick={() => { calculateAmount(v.price); console.log(v.id); setRoomPrice(v.price) }}>Submit</Button>
+                                    onClick={() => { calculateAmount(v.price); setRoomID(v.id); setRoomPrice(v.price) }}>Submit</Button>
                             </div>
                         </Container>
                     )}
@@ -118,9 +127,7 @@ export function Selectroom() {
                         <Button style={{
                             alignItems: 'flex-end'
                         }}
-                            onClick={() => {
-                                submitInfo(checkInDate, checkOutDate, roomPrice)
-                            }}>Submit</Button>
+                            onClick={() => { submitInfo(checkInDate, checkOutDate, roomPrice, roomID) }}>Submit</Button>
                     </Container>
                 </Grid.Col>
 

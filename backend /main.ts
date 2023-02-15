@@ -1,8 +1,9 @@
 import express from "express";
 import cors from "cors";
 import { userRoute } from "./Routes/userRoute";
-import { uploadFileRoute } from "./Routes/uploadFileRoute";
+
 import { roomInfoRoute } from "./Routes/roomInfoRoute";
+import path from "path";
 
 const app = express();
 export interface User {
@@ -27,8 +28,10 @@ app.use(express.json());
 
 //////////////////////////////////////////////////////////////////
 app.use(userRoute);
-app.use(uploadFileRoute);
+
 app.use(roomInfoRoute);
+
+app.use(express.static(path.join(__dirname, "uploads")));
 
 const port = 8080;
 app.listen(port, () => {
@@ -36,12 +39,12 @@ app.listen(port, () => {
 
   console.log("Listening on port", port);
 });
-function formidable(arg0: {
-  uploadDir: string;
-  keepExtensions: boolean;
-  maxFiles: number;
-  maxFileSize: number; // the default limit is 200KB
-  filter: (part: any) => any;
-}) {
-  throw new Error("Function not implemented.");
-}
+// function formidable(arg0: {
+//   uploadDir: string;
+//   keepExtensions: boolean;
+//   maxFiles: number;
+//   maxFileSize: number; // the default limit is 200KB
+//   filter: (part: any) => any;
+// }) {
+//   throw new Error("Function not implemented.");
+// }

@@ -1,4 +1,4 @@
-import { Grid, Modal, Alert, Group, Button } from "@mantine/core";
+import { Grid, Modal, Alert, Group, Button, Input, TextInput } from "@mantine/core";
 import { IconAlertCircle } from "@tabler/icons";
 import { useState } from "react";
 
@@ -45,6 +45,8 @@ export function Register() {
     ////////////password ///////
     const [popoverOpened, setPopoverOpened] = useState(false);
     const [value, setValue] = useState('');
+
+
     const checks = requirements.map((requirement, index) => (
         <PasswordRequirement key={index} label={requirement.label} meets={requirement.re.test(value)} />
     ));
@@ -55,11 +57,12 @@ export function Register() {
 
 
     const [info, setInfo] = useState({
-        username: "",
-
+        name: "",
         confirmpassword: "",
         email: "",
     })
+
+
 
 
 
@@ -77,28 +80,31 @@ export function Register() {
                     onClose={() => setOpened(false)}
                     title="Registration"
                 >
-                    {<form onSubmit={async (event) => {
+
+                    <form onSubmit={async (event) => {
                         event.preventDefault()
-                        let result = await fetch('http://localhost:8080/register', {
+                        await fetch('http://localhost:8080/register', {
                             method: "Post",
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                username: info.username,
+                                name: info.name,
                                 email: info.email,
                                 password: value
                             })
-
-
-
                         })
-                        console.log(result);
-
+                        setInfo({
+                            name: "",
+                            confirmpassword: "",
+                            email: "",
+                        })
+                        setValue("")
+                        setOpened(false);
 
                     }}>
                         <div style={{ display: "flex-block", justifyContent: "center", alignItems: "center" }}>
                             <div>
                                 <div>Username :</div>
-                                <input id="username" name="username" type="text" placeholder='username' value={info.username} onChange={e => { setInfo({ ...info, username: e.currentTarget.value }) }}></input>
+                                <TextInput required id="name" name="name" type="text" placeholder='username' value={info.name} onChange={e => { setInfo({ ...info, name: e.currentTarget.value }) }}></TextInput>
                                 <div>Password :</div>
                                 {/*  password */}
                                 <div >
@@ -138,16 +144,16 @@ export function Register() {
 
                                 {/* confirm password */}
                                 <div>email :</div>
-                                <input id="email" name="email " type="email" placeholder='email' value={info.email} onChange={e => { setInfo({ ...info, email: e.currentTarget.value }) }}></input>
+                                <TextInput required id="email" name="email " type="email" placeholder='email' value={info.email} onChange={e => { setInfo({ ...info, email: e.currentTarget.value }) }}></TextInput>
                             </div>
                             <p aria-hidden ></p>
                             <div >
-                                {value === info.confirmpassword ? <button onClick={() => { }}>Submit</button> : <Alert icon={<IconAlertCircle size={16} />} title="Bummer!" color="red">
+                                {value === info.confirmpassword ? <Button type="submit">Submit</Button> : <Alert icon={<IconAlertCircle size={16} />} title="Bummer!" color="red">
                                     Something terrible happened! password does not match!
                                 </Alert>}
                             </div>
                         </div>
-                    </form>}
+                    </form>
                 </Modal>
 
                 <Group position="center">

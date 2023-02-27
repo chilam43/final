@@ -8,6 +8,7 @@ export let roomInfoRoute = express.Router();
 export const roomInfoService = new RoomInfoService(knex);
 export const roomInfoController = new RommInfoController(roomInfoService);
 
+roomInfoRoute.get("/loadRoomInfo", roomInfoController.getRoomInfo);
 roomInfoRoute.post("/A", roomInfoController.setRoomInfo);
 roomInfoRoute.post("/B", roomInfoController.setRoomInfo);
 roomInfoRoute.post("/C", roomInfoController.setRoomInfo);

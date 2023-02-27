@@ -2,6 +2,15 @@ import { Knex } from "knex";
 export class RoomInfoService {
   constructor(private knex: Knex) {}
 
+  public getRoomInfo = async () => {
+    let result = await this.knex.raw(
+      `SELECT id,room_type ,picture,price,content FROM room_type ORDER BY id ASC`
+    );
+    // console.log("service room info", result.rows[0]);
+
+    return result.rows;
+  };
+
   public setRoomInfo = async (fields: any, files?: any) => {
     let result = await this.knex
       .select()

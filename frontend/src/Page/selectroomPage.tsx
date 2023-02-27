@@ -26,15 +26,21 @@ export function Selectroom() {
     const [roomID, setRoomID] = useState<any>()
 
     useEffect(() => {
-        async function loadRoomInfo() {
 
-            let res = await fetch('http://localhost:8080/loadRoomInfo')
-            let roomInfo = await res.json()
-            console.log(roomInfo);
 
-            setroomInfo(roomInfo.result)
+        async function searchAvailableRoom(checkInDate: any, checkOutDate: any) {
+            let res = await fetch('http://localhost:8080/roomAva', {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ checkInDate, checkOutDate })
+
+            })
+            let roomAvailable = await res.json()
+            console.log("real available room", roomAvailable.result);
+            setroomInfo(roomAvailable.result)
         }
-        loadRoomInfo()
+        searchAvailableRoom(checkInDate, checkOutDate)
+
 
     }, [])
 
@@ -44,7 +50,7 @@ export function Selectroom() {
     const token: any = localStorage.getItem('token')
     async function submitInfo(from: any, to: any, price: any, roomId: number) {
         let res = await fetch("http://localhost:8080/bookingRoom", {
-            method: "Post",
+            method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ from, to, price, roomId, token })
         })
@@ -84,9 +90,6 @@ export function Selectroom() {
                                         <p style={{ width: "30vh" }}>{v.content}</p>
                                         <hr></hr>
                                         <div>$ {v.price}</div>
-                                        {/* <p>Select a room type</p>
-                                        <p>Sleeps 31 ｜ King41 ｜ to 45 m²square metres</p>
-                                        <p>This room retains a contemporary ambience with high ceilings and large windows</p> */}
                                     </div>
                                 </Container>
                                 <Button style={{ alignItems: "center", margin: "65px 0px" }}

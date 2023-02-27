@@ -8,17 +8,17 @@ import jwtSimple from "jwt-simple";
 export class RommInfoController {
   constructor(private roomInfoService: RoomInfoService) {}
 
-  public getRoomInfo = async (req: any, res: any) => {
-    try {
-      let result = await this.roomInfoService.getRoomInfo();
-      // console.log("controller room info", result);
+  // public getRoomInfo = async (req: any, res: any) => {
+  //   try {
+  //     let result = await this.roomInfoService.getRoomInfo();
+  //     // console.log("controller room info", result);
 
-      return res.status(200).json({ result });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: "internal_server error" });
-    }
-  };
+  //     return res.status(200).json({ result });
+  //   } catch (error) {
+  //     console.log(error);
+  //     res.status(500).json({ error: "internal_server error" });
+  //   }
+  // };
   public setRoomInfo = async (req: any, res: any) => {
     try {
       form.parse(req, async (err: any, fields: any, files: any) => {
@@ -40,6 +40,18 @@ export class RommInfoController {
   public bookingRoom = async (req: any, res: any) => {
     try {
       let result = await this.roomInfoService.bookingRoom(req);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "internal_server error" });
+    }
+  };
+  public searchAvailableRoom = async (req: any, res: any) => {
+    try {
+      // console.log("controller search room", req.body);
+      let result = await this.roomInfoService.searchAvailableRoom(req);
+      console.log("result from service book room", result);
+
+      return res.status(200).json({ result });
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: "internal_server error" });

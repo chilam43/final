@@ -2,15 +2,6 @@ import { Knex } from "knex";
 export class RoomInfoService {
   constructor(private knex: Knex) {}
 
-  public getRoomInfo = async () => {
-    let result = await this.knex.raw(
-      `SELECT id,room_type ,picture,price,content FROM room_type ORDER BY id ASC`
-    );
-    // console.log("service room info", result.rows[0]);
-
-    return result.rows;
-  };
-
   public setRoomInfo = async (fields: any, files?: any) => {
     let result = await this.knex
       .select()
@@ -53,5 +44,57 @@ export class RoomInfoService {
   };
   public bookingRoom = async (req: any) => {
     let resutl = await this.knex.insert({});
+  };
+  public searchAvailableRoom = async (req: any) => {
+    let inin = new Date(req.body.checkInDate);
+    let outout = new Date(req.body.checkOutDate);
+    let checkIn = inin.toDateString();
+    let checkOut = outout.toDateString();
+    // console.log(checkIn, checkOut);
+
+    let data = await this.knex.raw(
+      `SELECT room_number_status.*
+    FROM room_number_status
+    WHERE id NOT IN (
+        SELECT room_number_status.id
+        FROM booking_record
+        JOIN room_number_status on booking_record.room_id = room_number_status.id
+        WHERE NOT (
+            check_in_date::date >= ?::date
+            OR check_out_date::date <= ?::date
+        )
+        AND payment_time is NULL
+        AND (
+          now()::timestamp < lock_time::timestamp
+          AND payment_time is NULL
+          AND cancel_time is NULL
+        )
+
+        UNION
+        SELECT room_number_status.id
+        FROM booking_record
+        JOIN room_number_status on booking_record.room_id = room_number_status.id
+        WHERE payment_time is NOT NULL
+        AND (
+            check_in_date::date >= ?::date
+            OR check_out_date::date <= ?::date
+        )
+         AND cancel_time is NOT NULL
+    )`,
+      [checkIn, checkOut, checkIn, checkOut]
+    );
+
+    // console.log("room id available", data.rows);
+
+    const room_id_list: any[] = Array.from(
+      new Set(data.rows.map((v: any) => v.room_type_id))
+    );
+
+    let roomAvailable = await this.knex
+      .select("*")
+      .from("room_type")
+      .whereIn("id", room_id_list);
+
+    return roomAvailable;
   };
 }

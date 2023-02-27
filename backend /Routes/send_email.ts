@@ -23,14 +23,14 @@ export async function sendEmailToUsers(ref_num: string) {
     },
     port: 587, //
     auth: {
-      user: "hotelbooking6969@outlook.com", // generated ethereal user
-      pass: "iwant6969", // generated ethereal password
+      user: "hotelbooking43@hotmail.com", // generated ethereal user
+      pass: "bookingsystem43", // generated ethereal password
     },
   });
-  console.log(paymentRecord.rows)
+  console.log(paymentRecord.rows);
   // send mail with defined transport object
   let info = await transporter.sendMail({
-    from: "hotelbooking6969@outlook.com", // sender address
+    from: "hotelbooking43@hotmail", // sender address
     to: paymentRecord.rows[0].email, // list of receivers
     subject: "Thank You For your booking", // Subject line
     text: `ref no. ${paymentRecord.rows[0].ref_number} , check in date ${paymentRecord.rows[0].check_in_date} , check out date ${paymentRecord.rows[0].check_out_date}`, // plain text body

@@ -25,6 +25,7 @@ export function PicktodaySelectRoom() {
     const navigate = useNavigate();
     const params: any = { checkInDate: value[0], checkOutDate: value[1], totalDay: total }
 
+
     useEffect(() => {
         caldays()
     }, [value[1]])
@@ -46,12 +47,22 @@ export function PicktodaySelectRoom() {
 
 
     }
-    async function fetchDate() {
-        await fetch('checkava', {
-            method: "Post",
+    // async function fetchDate() {
+    //     await fetch('checkava', {
+    //         method: "Post",
+    //         headers: { 'Content-Type': 'application/json' },
+    //         body: JSON.stringify({ in: value[0], out: value[1] })
+    //     })
+    // }
+    async function searchAvailableRoom(checkInDate: any, checkOutDate: any) {
+        let res = await fetch('http://localhost:8080/roomAva', {
+            method: "POST",
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ in: value[0], out: value[1] })
+            body: JSON.stringify({ checkInDate, checkOutDate })
+
         })
+        console.log(res);
+
     }
 
 
@@ -71,7 +82,9 @@ export function PicktodaySelectRoom() {
                 </div>
                 <div style={{ margin: "0px 10px" }}>
                     <button type="submit" onClick={() => {
-                        fetchDate(); handleClick()
+                        handleClick(); searchAvailableRoom(value[0], value[1])
+
+
                     }}>Check Availability</button>
                 </div>
                 <div style={{ margin: "0px 10px", display: "flex" }}>

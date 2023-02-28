@@ -78,14 +78,14 @@ export function Selectroom() {
                     {/* render room info from here!!! */}
 
                     {roomInfo.map(v =>
-                        <Container style={{ border: "black solid 4px", height: "25vh", backgroundColor: 'white', }}>
+                        <Container style={{ height: "25vh", backgroundColor: 'white', paddingTop: "10px" }}>
                             <div style={{ display: "flex", margin: "0px" }}>
                                 <Image style={{ height: "400px", width: "200px" }}
                                     radius="md"
                                     src={`http://localhost:8080/${v.picture}`}
                                 />
 
-                                <Container style={{ border: "black solid 4px", alignSelf: '100%', height: "25vh", width: "15vh", margin: 0, paddingRight: "200px" }}>
+                                <Container style={{ alignSelf: '100%', height: "25vh", width: "15vh", margin: 0, paddingRight: "200px" }}>
                                     <div>
                                         <p style={{ width: "30vh" }}>{v.content}</p>
                                         <hr></hr>
@@ -128,7 +128,7 @@ export function Selectroom() {
                             </div>
                         </div>
                         <Button style={{
-                            alignItems: 'flex-end'
+                            alignItems: 'flex-end', marginLeft: "300px"
                         }}
                             onClick={() => { submitInfo(checkInDate, checkOutDate, roomPrice, roomID) }}>Submit</Button>
                     </Container>
